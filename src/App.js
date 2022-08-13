@@ -1,24 +1,54 @@
-import logo from './logo.svg';
-import './App.css';
+import { useState } from "react";
+import { FiSearch } from "react-icons/fi";
+import api from "./services/api";
 
 function App() {
+
+    const [input, SetInput] = useState('');
+    const [cep, SetCep] = useState({});
+
+    async function Pesquisar(){
+      if(input === ''){
+        alert('O campo está vazio');
+      }else{
+        try {
+          const response = await api.get(`${input}/json`);
+          SetCep(response.data);
+          Limpar();
+        } catch (e) {
+          alert('Error');
+          Limpar();
+        }
+      }
+    }
+
+    function Limpar(){
+      SetInput("");
+    }
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <section className="container">
+      <h2>Buscar CEP</h2>
+
+      <div className="container_Input">
+        <input type="text" value={input} name="cep" onChange={(e)=> SetInput(e.target.value)} placeholder="Digite o seu cep..." />
+
+        <button  onClick={Pesquisar}>
+          <FiSearch/>
+        </button>
+      </div> {/* Container input */}
+
+       {Object.keys(cep).length > 0 && (
+          <div className="container_Info">
+          <h3>{cep.cep}</h3>
+  
+          <span>{cep.localidade} - {cep.uf}</span>
+          <span>DDD: {cep.ddd}</span>
+  
+        </div>
+       )}
+
+    </section>
   );
 }
 
